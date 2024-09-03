@@ -63,19 +63,12 @@ return {
           end,
           desc = "Open vimwiki",
         },
-
-        -- navigate buffer tabs
-        ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
-        ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
-
-        -- mappings seen under group name "Buffer"
-        ["<Leader>bd"] = {
+        ["<Leader>,"] = {
           function()
-            require("astroui.status.heirline").buffer_picker(
-              function(bufnr) require("astrocore.buffer").close(bufnr) end
-            )
+            require("diary").tab_view(vim.fs.normalize "~/.config/astronvim_v4")
+            require("telescope.builtin").find_files()
           end,
-          desc = "Close buffer from tabline",
+          desc = "Open neovim config",
         },
 
         -- setting a mapping to false will disable it

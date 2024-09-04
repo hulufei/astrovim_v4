@@ -41,6 +41,7 @@ local function markdown_setup()
     end
     vim.keymap.set("n", "<cr>", _3_, {buffer = true, desc = "Basic create on press enter on links"})
     vim.opt_local.spell = true
+    vim.opt_local.spelllang = "en,cjk"
     local surround = require("nvim-surround")
     local function _6_()
       local link = get_input("Enter the link:", "file")

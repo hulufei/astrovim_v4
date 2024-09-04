@@ -56,6 +56,7 @@
                         :desc "Basic create on press enter on links"})
 
        (set vim.opt_local.spell true) ; Enable spell
+       (set vim.opt_local.spelllang "en,cjk")
        ;; Coceal code blocks is annoying, so disabled conceal by default
        ; (set vim.opt_local.conceallevel 2) ; Enable conceal
 

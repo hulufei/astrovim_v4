@@ -23,6 +23,7 @@ return {
 
   {
     "windwp/nvim-autopairs",
+    opts = { enable_check_bracket_line = false },
     config = function(plugin, opts)
       require "astronvim.plugins.configs.nvim-autopairs" (plugin, opts) -- include the default astronvim config that calls the setup call
       -- add more custom autopairs configuration such as custom rules
@@ -48,6 +49,9 @@ return {
         -- disable for .vim files, but it work for another filetypes
         Rule("a", "a", "-vim")
       )
+      -- remove add single quote on filetype scheme or lisp
+      npairs.get_rules("'")[1].not_filetypes = { "scheme", "lisp" }
+      npairs.get_rules("'")[1]:with_pair(cond.not_after_text("["))
     end,
   },
 }

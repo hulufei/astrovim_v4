@@ -23,6 +23,27 @@
                end)) ; Convert charidx to byteidx
   (unpack (vim.api.nvim_buf_get_text 0 row start row end [])))
 
+(fn check-list-section [pattern]
+  (let [row (. (vim.api.nvim_win_get_cursor 0) 1)
+        prev-line-text (vim.fn.getline (- row 1))
+        item-match (string.match prev-line-text pattern)]
+    (values item-match row)))
+
+(fn insert-list-item []
+  (vim.api.nvim_command "startinsert")
+  (let [todo-pattern "^%s*%- %[.?%] "
+        dash-pattern "^%s*%- "
+        star-pattern "^%s*%* "]
+    (var (list-item-match row) (check-list-section todo-pattern))
+    (when (not list-item-match)
+      (set list-item-match (check-list-section dash-pattern))
+      (when (not list-item-match)
+        (set list-item-match (check-list-section star-pattern))))
+    (when list-item-match
+      (vim.api.nvim_buf_set_text
+        0 (- row 1) 0 (- row 1) 0 [list-item-match])
+      (vim.api.nvim_win_set_cursor 0 [row (+ (string.len list-item-match) 1)]))))
+
 (fn markdown-setup []
   (local group (vim.api.nvim_create_augroup "md_augroup" {:clear true}))
   (vim.api.nvim_create_autocmd
@@ -33,6 +54,20 @@
      (fn [_args]
        (vim.opt_local.formatoptions:append "cmB") ; Make `gw` works for cjk, m - Also break at a multi-byte character above 255.
 
+       ; Insert list items
+       (vim.keymap.set
+         "i" "<CR>"
+         (fn []
+           ; Keep default behavior first, using exe to insert <cr> character
+           (vim.api.nvim_command "exe 'normal! i\r'")
+           (insert-list-item))
+         {:buffer true})
+       (vim.keymap.set
+         "n" "o"
+         (fn []
+           (vim.api.nvim_command "normal! o")
+           (insert-list-item))
+         {:buffer true})
        ; -- It basically jumps to the previous spelling mistake [s,
        ; -- then picks the first suggestion 1z=, and then jumps back `]a.
        ; -- The <c-g>u in the middle make it possible to undo the spelling correction quickly.

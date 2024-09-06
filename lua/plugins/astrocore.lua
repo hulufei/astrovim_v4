@@ -65,7 +65,7 @@ return {
         },
         ["<Leader>,"] = {
           function()
-            require("diary").tab_view(vim.fs.normalize "~/.config/astronvim_v4")
+            require("diary").tab_view(vim.fs.normalize "~/.config/nvim")
             require("telescope.builtin").find_files()
           end,
           desc = "Open neovim config",

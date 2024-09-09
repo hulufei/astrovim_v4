@@ -1,3 +1,3 @@
 {1 :hulufei/diary.nvim
- :dev true
+ :dev false
  :opts {:diary-dir "~/vimwiki/diary"}}

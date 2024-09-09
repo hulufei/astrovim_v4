@@ -8,4 +8,4 @@ local function _1_()
   codecompanion.setup({strategies = {chat = {adapter = "gemini"}, inline = {adapter = "gemini"}, agent = {adapter = "gemini"}}, adapters = {gemini = _2_}})
   return vim.cmd.cab("cc", "CodeCompanion")
 end
-return {"olimorris/codecompanion.nvim", dev = true, dependencies = {"nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter"}, config = _1_, lazy = false}
+return {"olimorris/codecompanion.nvim", dependencies = {"nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter"}, config = _1_, dev = false, lazy = false}

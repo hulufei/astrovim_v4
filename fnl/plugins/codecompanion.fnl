@@ -1,7 +1,7 @@
 {
  1 :olimorris/codecompanion.nvim
  :lazy false
- :dev true
+ :dev false
  :dependencies ["nvim-lua/plenary.nvim" "nvim-treesitter/nvim-treesitter"]
  :config
  (fn []

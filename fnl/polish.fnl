@@ -23,26 +23,39 @@
                end)) ; Convert charidx to byteidx
   (unpack (vim.api.nvim_buf_get_text 0 row start row end [])))
 
+(fn empty-str? [s]
+  (or (not s) (= (length (vim.trim s)) 0)))
+
 (fn check-list-section [pattern]
   (let [row (. (vim.api.nvim_win_get_cursor 0) 1)
         prev-line-text (vim.fn.getline (- row 1))
-        item-match (string.match prev-line-text pattern)]
-    (values item-match row)))
+        (prefix text) (string.match prev-line-text pattern)]
+    (values prefix text row)))
 
+
+; - [ ] 
+; (insert-list-item)
+; (vim.api.nvim_buf_set_text 0 35 0 35 3 ["hello"])
+; (var (a b c) (check-list-section "^%s*(%- )([^%[%]]*)"))
 (fn insert-list-item []
   (vim.api.nvim_command "startinsert")
-  (let [todo-pattern "^%s*%- %[.?%] "
-        dash-pattern "^%s*%- "
-        star-pattern "^%s*%* "]
-    (var (list-item-match row) (check-list-section todo-pattern))
-    (when (not list-item-match)
-      (set list-item-match (check-list-section dash-pattern))
-      (when (not list-item-match)
-        (set list-item-match (check-list-section star-pattern))))
-    (when list-item-match
-      (vim.api.nvim_buf_set_text
-        0 (- row 1) 0 (- row 1) 0 [list-item-match])
-      (vim.api.nvim_win_set_cursor 0 [row (+ (string.len list-item-match) 1)]))))
+  (let [todo-pattern "^%s*(%- %[.?%] )(.*)"
+        dash-pattern "^%s*(%- )([^%[%]]*)"
+        star-pattern "^%s*(%* )(.*)"]
+    (var (prefix text row) (check-list-section todo-pattern))
+    (when (not prefix)
+      (set (prefix text) (check-list-section dash-pattern))
+      (when (not prefix)
+        (set (prefix text) (check-list-section star-pattern))))
+    (when prefix
+      (if (empty-str? text)
+        ; Get out of list section
+        (vim.api.nvim_buf_set_text
+            0 (- row 2) 0 (- row 2) (length (vim.fn.getline (- row 1))) [""])
+        (do
+          (vim.api.nvim_buf_set_text
+            0 (- row 1) 0 (- row 1) 0 [prefix])
+          (vim.api.nvim_win_set_cursor 0 [row (+ (string.len prefix) 1)]))))))
 
 (fn markdown-setup []
   (local group (vim.api.nvim_create_augroup "md_augroup" {:clear true}))

@@ -1,4 +1,6 @@
 -- [nfnl] Compiled from fnl/polish.fnl by https://github.com/Olical/nfnl, do not edit.
+local _local_1_ = require("nfnl.string")
+local blank_3f = _local_1_["blank?"]
 local function get_input(prompt, completion)
   local ok, result = pcall(vim.fn.input, {prompt = prompt, completion = completion, cancelreturn = vim.NIL})
   if (ok and (result ~= vim.NIL)) then
@@ -14,9 +16,6 @@ local function get_vselect_text()
   local start0 = (start - 1)
   local _end0 = vim.fn.byteidx(unpack(vim.api.nvim_buf_get_lines(0, row0, (row0 + 1), nil)), _end)
   return unpack(vim.api.nvim_buf_get_text(0, row0, start0, row0, _end0, {}))
-end
-local function empty_str_3f(s)
-  return (not s or (#vim.trim(s) == 0))
 end
 local function check_list_section(pattern)
   local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -39,7 +38,7 @@ local function insert_list_item()
   else
   end
   if prefix then
-    if empty_str_3f(text) then
+    if blank_3f(text) then
       return vim.api.nvim_buf_set_text(0, (row - 2), 0, (row - 2), #vim.fn.getline((row - 1)), {""})
     else
       vim.api.nvim_buf_set_text(0, (row - 1), 0, (row - 1), 0, {prefix})
@@ -58,23 +57,23 @@ local function toggle_todo_item()
 end
 local function markdown_setup()
   local group = vim.api.nvim_create_augroup("md_augroup", {clear = true})
-  local function _6_(_args)
+  local function _7_(_args)
     vim.opt_local.formatoptions:append("cmB")
-    local function _7_()
+    local function _8_()
       vim.api.nvim_command("exe 'normal! i\13'")
       return insert_list_item()
     end
-    vim.keymap.set("i", "<CR>", _7_, {buffer = true})
-    local function _8_()
+    vim.keymap.set("i", "<CR>", _8_, {buffer = true})
+    local function _9_()
       vim.api.nvim_command("normal! o")
       return insert_list_item()
     end
-    vim.keymap.set("n", "o", _8_, {buffer = true})
+    vim.keymap.set("n", "o", _9_, {buffer = true})
     vim.keymap.set("n", "<LocalLeader>x", toggle_todo_item, {buffer = true, desc = "Toggle TODO"})
     vim.keymap.set("i", "<C-l>", "<c-g>u<Esc>[s1z=`]a<c-g>u")
     vim.keymap.set("n", "<tab>", ":call search('\\V](\\.\\+)')<cr>", {buffer = true})
     vim.keymap.set("n", "<s-tab>", ":call search('\\V](\\.\\+)', 'b')<cr>", {buffer = true})
-    local function _9_()
+    local function _10_()
       local line = vim.fn.getline(".")
       local link = string.match(line, "%b[]%((.-)%)")
       if (link and not string.match(link, "https?://")) then
@@ -91,11 +90,11 @@ local function markdown_setup()
         return nil
       end
     end
-    vim.keymap.set("n", "<cr>", _9_, {buffer = true, desc = "Basic create on press enter on links"})
+    vim.keymap.set("n", "<cr>", _10_, {buffer = true, desc = "Basic create on press enter on links"})
     vim.opt_local.spell = true
     vim.opt_local.spelllang = "en,cjk"
     local surround = require("nvim-surround")
-    local function _12_()
+    local function _13_()
       local link = get_input("Enter the link:", "file")
       if link then
         return {{"["}, {("](" .. link .. ")")}}
@@ -103,10 +102,10 @@ local function markdown_setup()
         return nil
       end
     end
-    local function _14_()
+    local function _15_()
       return {{""}, {""}}
     end
-    local function _15_()
+    local function _16_()
       local link = get_vselect_text()
       if link then
         return {{"["}, {("](" .. string.lower(string.gsub(link, "[%p%s]+", "-")) .. ")")}}
@@ -114,12 +113,12 @@ local function markdown_setup()
         return nil
       end
     end
-    local function _17_()
+    local function _18_()
       return {{"**"}, {"**"}}
     end
-    return surround.buffer_setup({surrounds = {l = {add = _12_, find = "%b[]%b()", delete = "^(%[)().-(%]%b())()$", change = {target = "^()()%b[]%((.-)()%)$", replacement = _14_}}, ["<cr>"] = {add = _15_}, s = {add = _17_, find = "%*%*.-%*%*", delete = "^(%*%*)().-(%*%*)()$"}}})
+    return surround.buffer_setup({surrounds = {l = {add = _13_, find = "%b[]%b()", delete = "^(%[)().-(%]%b())()$", change = {target = "^()()%b[]%((.-)()%)$", replacement = _15_}}, ["<cr>"] = {add = _16_}, s = {add = _18_, find = "%*%*.-%*%*", delete = "^(%*%*)().-(%*%*)()$"}}})
   end
-  vim.api.nvim_create_autocmd("FileType", {pattern = "markdown", group = group, callback = _6_})
+  vim.api.nvim_create_autocmd("FileType", {pattern = "markdown", group = group, callback = _7_})
   vim.opt.shell = "fish"
   return vim.cmd("\n    map ,ch :call SetColorColumn()<CR>\n    function! SetColorColumn()\n      let col_num = virtcol('.')\n      let cc_list = split(&cc, ',')\n      if count(cc_list, string(col_num)) <= 0\n      execute 'set cc+='.col_num\n      else\n      execute 'set cc-='.col_num\n      endif\n    endfunction\n    ")
 end

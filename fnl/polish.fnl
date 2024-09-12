@@ -1,6 +1,7 @@
 ; This will run last in the setup process and is a good place to configure
 ; things like custom filetypes. This just pure lua so anything that doesn't
 ; fit in the normal config locations above can go here
+(local {: blank?} (require :nfnl.string))
 
 (fn get-input [prompt completion]
   ; Modified get_input to support completion option
@@ -22,9 +23,6 @@
                (unpack (vim.api.nvim_buf_get_lines 0 row (+ row 1) nil))
                end)) ; Convert charidx to byteidx
   (unpack (vim.api.nvim_buf_get_text 0 row start row end [])))
-
-(fn empty-str? [s]
-  (or (not s) (= (length (vim.trim s)) 0)))
 
 (fn check-list-section [pattern]
   (let [row (. (vim.api.nvim_win_get_cursor 0) 1)
@@ -48,7 +46,7 @@
       (when (not prefix)
         (set (prefix text) (check-list-section star-pattern))))
     (when prefix
-      (if (empty-str? text)
+      (if (blank? text)
         ; Get out of list section
         (vim.api.nvim_buf_set_text
             0 (- row 2) 0 (- row 2) (length (vim.fn.getline (- row 1))) [""])

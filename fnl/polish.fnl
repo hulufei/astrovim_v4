@@ -57,6 +57,15 @@
             0 (- row 1) 0 (- row 1) 0 [prefix])
           (vim.api.nvim_win_set_cursor 0 [row (+ (string.len prefix) 1)]))))))
 
+; - [ ] (toggle-todo-item)
+(fn toggle-todo-item []
+  (let [todo-pattern "^%s*%- %[(.?)%] "
+        row (vim.fn.line ".")
+        text (vim.fn.getline ".")
+        toggle-text (string.gsub text todo-pattern {"x" "- [ ] " " " "- [x] "})]
+    (vim.api.nvim_buf_set_text
+      0 (- row 1) 0 (- row 1) (length toggle-text) [toggle-text])))
+
 (fn markdown-setup []
   (local group (vim.api.nvim_create_augroup "md_augroup" {:clear true}))
   (vim.api.nvim_create_autocmd
@@ -81,6 +90,11 @@
            (vim.api.nvim_command "normal! o")
            (insert-list-item))
          {:buffer true})
+       (vim.keymap.set
+         "n" "<LocalLeader>x"
+         toggle-todo-item
+         {:buffer true
+          :desc "Toggle TODO"})
        ; -- It basically jumps to the previous spelling mistake [s,
        ; -- then picks the first suggestion 1z=, and then jumps back `]a.
        ; -- The <c-g>u in the middle make it possible to undo the spelling correction quickly.

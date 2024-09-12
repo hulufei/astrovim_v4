@@ -49,6 +49,13 @@ local function insert_list_item()
     return nil
   end
 end
+local function toggle_todo_item()
+  local todo_pattern = "^%s*%- %[(.?)%] "
+  local row = vim.fn.line(".")
+  local text = vim.fn.getline(".")
+  local toggle_text = string.gsub(text, todo_pattern, {x = "- [ ] ", [" "] = "- [x] "})
+  return vim.api.nvim_buf_set_text(0, (row - 1), 0, (row - 1), #toggle_text, {toggle_text})
+end
 local function markdown_setup()
   local group = vim.api.nvim_create_augroup("md_augroup", {clear = true})
   local function _6_(_args)
@@ -63,6 +70,7 @@ local function markdown_setup()
       return insert_list_item()
     end
     vim.keymap.set("n", "o", _8_, {buffer = true})
+    vim.keymap.set("n", "<LocalLeader>x", toggle_todo_item, {buffer = true, desc = "Toggle TODO"})
     vim.keymap.set("i", "<C-l>", "<c-g>u<Esc>[s1z=`]a<c-g>u")
     vim.keymap.set("n", "<tab>", ":call search('\\V](\\.\\+)')<cr>", {buffer = true})
     vim.keymap.set("n", "<s-tab>", ":call search('\\V](\\.\\+)', 'b')<cr>", {buffer = true})

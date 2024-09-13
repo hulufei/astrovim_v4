@@ -25,9 +25,9 @@ local function check_list_section(pattern)
 end
 local function insert_list_item()
   vim.api.nvim_command("startinsert")
-  local todo_pattern = "^%s*(%- %[.?%] )(.*)"
-  local dash_pattern = "^%s*(%- )([^%[%]]*)"
-  local star_pattern = "^%s*(%* )(.*)"
+  local todo_pattern = "^%s*(%-%s%[[x%s]?%]%s)(.*)"
+  local dash_pattern = "^%s*(%-%s)(.*)"
+  local star_pattern = "^%s*(%*%s)(.*)"
   local prefix, text, row = check_list_section(todo_pattern)
   if not prefix then
     prefix, text = check_list_section(dash_pattern)
@@ -49,7 +49,7 @@ local function insert_list_item()
   end
 end
 local function toggle_todo_item()
-  local todo_pattern = "^%s*%- %[(.?)%] "
+  local todo_pattern = "^%s*%-%s%[([x%s]?)%]%s"
   local row = vim.fn.line(".")
   local text = vim.fn.getline(".")
   local toggle_text = string.gsub(text, todo_pattern, {x = "- [ ] ", [" "] = "- [x] "})
@@ -118,8 +118,8 @@ local function markdown_setup()
     end
     return surround.buffer_setup({surrounds = {l = {add = _13_, find = "%b[]%b()", delete = "^(%[)().-(%]%b())()$", change = {target = "^()()%b[]%((.-)()%)$", replacement = _15_}}, ["<cr>"] = {add = _16_}, s = {add = _18_, find = "%*%*.-%*%*", delete = "^(%*%*)().-(%*%*)()$"}}})
   end
-  vim.api.nvim_create_autocmd("FileType", {pattern = "markdown", group = group, callback = _7_})
-  vim.opt.shell = "fish"
-  return vim.cmd("\n    map ,ch :call SetColorColumn()<CR>\n    function! SetColorColumn()\n      let col_num = virtcol('.')\n      let cc_list = split(&cc, ',')\n      if count(cc_list, string(col_num)) <= 0\n      execute 'set cc+='.col_num\n      else\n      execute 'set cc-='.col_num\n      endif\n    endfunction\n    ")
+  return vim.api.nvim_create_autocmd("FileType", {pattern = "markdown", group = group, callback = _7_})
 end
+vim.opt.shell = "fish"
+vim.cmd("\n  map ,ch :call SetColorColumn()<CR>\n  function! SetColorColumn()\n    let col_num = virtcol('.')\n    let cc_list = split(&cc, ',')\n    if count(cc_list, string(col_num)) <= 0\n    execute 'set cc+='.col_num\n    else\n    execute 'set cc-='.col_num\n    endif\n  endfunction\n  ")
 return markdown_setup()

@@ -30,16 +30,15 @@
         (prefix text) (string.match prev-line-text pattern)]
     (values prefix text row)))
 
-
 ; - [ ] 
 ; (insert-list-item)
 ; (vim.api.nvim_buf_set_text 0 35 0 35 3 ["hello"])
 ; (var (a b c) (check-list-section "^%s*(%- )([^%[%]]*)"))
 (fn insert-list-item []
   (vim.api.nvim_command "startinsert")
-  (let [todo-pattern "^%s*(%- %[.?%] )(.*)"
-        dash-pattern "^%s*(%- )([^%[%]]*)"
-        star-pattern "^%s*(%* )(.*)"]
+  (let [todo-pattern "^%s*(%-%s%[[x%s]?%]%s)(.*)"
+        dash-pattern "^%s*(%-%s)(.*)"
+        star-pattern "^%s*(%*%s)(.*)"]
     (var (prefix text row) (check-list-section todo-pattern))
     (when (not prefix)
       (set (prefix text) (check-list-section dash-pattern))
@@ -57,7 +56,7 @@
 
 ; - [ ] (toggle-todo-item)
 (fn toggle-todo-item []
-  (let [todo-pattern "^%s*%- %[(.?)%] "
+  (let [todo-pattern "^%s*%-%s%[([x%s]?)%]%s"
         row (vim.fn.line ".")
         text (vim.fn.getline ".")
         toggle-text (string.gsub text todo-pattern {"x" "- [ ] " " " "- [x] "})]
@@ -141,21 +140,22 @@
                       "s" {:add (fn [] [[:**] [:**]]) ; **strong**
                            :find "%*%*.-%*%*"
                            :delete "^(%*%*)().-(%*%*)()$"}}}))})
-  (set vim.opt.shell "fish")
-  ; (set vim.o.timeoutlen 150)
-  ;; vertical line ruler
-  (vim.cmd "
-    map ,ch :call SetColorColumn()<CR>
-    function! SetColorColumn()
-      let col_num = virtcol('.')
-      let cc_list = split(&cc, ',')
-      if count(cc_list, string(col_num)) <= 0
-      execute 'set cc+='.col_num
-      else
-      execute 'set cc-='.col_num
-      endif
-    endfunction
-    ")
 )
+
+(set vim.opt.shell "fish")
+; (set vim.o.timeoutlen 150)
+;; vertical line ruler
+(vim.cmd "
+  map ,ch :call SetColorColumn()<CR>
+  function! SetColorColumn()
+    let col_num = virtcol('.')
+    let cc_list = split(&cc, ',')
+    if count(cc_list, string(col_num)) <= 0
+    execute 'set cc+='.col_num
+    else
+    execute 'set cc-='.col_num
+    endif
+  endfunction
+  ")
 
 (markdown-setup)
